@@ -1,8 +1,6 @@
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 
 public class testCoverage {
@@ -25,19 +23,27 @@ public class testCoverage {
 
     @Test
     public void testReadDataFromFile() throws IOException {
+            //anzahl der Elemente gleich ?
+            // ob elements nicht null ist bei allen ex.md Dateien in einer Schleife
+             //Fehlerfall, wenn da andere Zahlen als 0 und 1 vorkommen
+        //Test für die IO Exception
 
+    }
 
+    @Test
+    public void writeData(){
+        //Fehler Message abtesten
     }
 
 
 
     @Test
     public void testGenerateMcDC(){
-
+        //einfach alles notwenidge aufrufen und am Ende mit der Lösung vergleichen (2-3x)
     }
 
     @Test
     public void testGenerateMBUU(){
-
+        //einfach alles notwenidge aufrufen und am Ende mit der Lösung vergleichen (2-3x)
     }
 }

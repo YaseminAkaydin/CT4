@@ -64,7 +64,8 @@ public class Parser {
             e.printStackTrace();
 
         }
-        System.out.println(elements);
+        System.out.println("---"+elements);
+        System.out.println(Arrays.stream(elements).toList());
         return elements;
 
     }
