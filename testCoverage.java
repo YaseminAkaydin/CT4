@@ -95,7 +95,7 @@ public class testCoverage {
 
     @Test
     public void testAufgabe2aMbuu()  {
-        String datName = "/Users/yaseminakaydin/Desktop/exercises/AUfgabe2a.md";
+        String datName = "/Users/yaseminakaydin/Desktop/exercises/Aufgabe2a.md";
         String[] elements= Parser.readData(datName);
         List<List<Integer>> nums= Parser.mapToList(Parser.generateMBUU(Parser.numbers(elements)));
         Parser.writeData("/Users/yaseminakaydin/Desktop/exercises/mbuuTestAufgabe2a.md", Parser.header(elements), nums);
