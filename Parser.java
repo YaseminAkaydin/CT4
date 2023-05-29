@@ -145,9 +145,7 @@ public class Parser {
                 }
         }
         }
-        for (Map.Entry<List<Integer>, Integer> entry : cases.entrySet()) {
-           System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-        }
+
         return cases;
 
     }
@@ -215,9 +213,7 @@ public class Parser {
             }
         }
 
-        for (Map.Entry<List<Integer>, List<String>> entry : cases.entrySet()) {
-            System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-        }
+
         return cases;
     }
     
@@ -229,7 +225,6 @@ public class Parser {
             List<Integer> entryList = new ArrayList<>(entry.getKey());
             entryList.add(entry.getValue()); num.add(entryList);
         }
-        System.out.println(num);
         return num;
         
     }
@@ -306,7 +301,6 @@ public class Parser {
 
         }
 
-        System.out.println(testCases);
         return testCases;
 
     }
@@ -325,18 +319,28 @@ public class Parser {
 
             }
         }
-        System.out.println("---"+cases+"---");
             return cases;
 
     }
+    public static String extractFileName(String path) {
+        int lastIndex = path.lastIndexOf("/");
+
+        if (lastIndex != -1 && lastIndex < path.length() - 1) {
+            return path.substring(lastIndex + 1, path.length()-3);
+        } else {
+            return null;
+        }
+    }
+
 
     public static void generateList(List<String> pathNames, boolean coverage) {
         int counter= 0;
+        String basePathToWrite="/Users/yaseminakaydin/Desktop/exercises/Results/";
             for (String path: pathNames) {
                 if(coverage){
                 String[] elements= readData(path);
-                String pathResult= path.substring(0, path.length() - 3);
-                writeData("/Users/yaseminakaydin/Desktop/exercises/" + pathResult + "McDcTest"  + counter+ ".md" ,
+                String fileName= extractFileName(path);
+                writeData(basePathToWrite + fileName + "McDcTest.md" ,
                         header(elements),findConditionsForMcDC(
                                 findTestCasesForMcDc(
                                         generateTestMCDC(3,numbers(elements))), numbers(elements)) );
@@ -345,9 +349,9 @@ public class Parser {
 
             } else {
                     String[] elements= readData(path);
-                    String pathResult= path.substring(0, path.length() - 3);
+                    String fileName= extractFileName(path);
                     List<List<Integer>> nums= Parser.mapToList(Parser.generateMBUU(Parser.numbers(elements)));
-                    writeData("/Users/yaseminakaydin/Desktop/exercises/" + pathResult + "MBUUTest"+ counter+".md", Parser.header(elements), nums);
+                    writeData(basePathToWrite + fileName + "MBUUTest.md", Parser.header(elements), nums);
                 }
 
 
