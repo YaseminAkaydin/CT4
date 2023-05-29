@@ -23,7 +23,7 @@ public class Parser {
             }
 
 
-            Files.writeString(filePath,st.toString() + "\n", StandardOpenOption.CREATE_NEW);
+            Files.writeString(filePath,st.toString() + "\n",StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             Files.writeString(filePath,"| --- | --- | --- | --- |\n", StandardOpenOption.APPEND);
 
             for( List<Integer> innerList : numbers){
@@ -41,6 +41,7 @@ public class Parser {
             System.out.println("Fehler beim Schreiben in die Markdown-Datei: " + e.getMessage());
         }
     }
+
 
 
 
@@ -161,22 +162,15 @@ public class Parser {
 
 
         String condition = "";
+        int limit= (int) (Math.pow(2, numberCond)/2);
 
         for (int i = 0; i < numberCond; i++) {
             Map<List<Integer>, Integer> tmpNumbers = new HashMap(numberMap);
-            //TODO Switch Case mit for i Schleife ersetzen,
-            switch (i) {
-                case (0):
-                    condition="A";
-                    break;
-                case (1):
-                    condition="B";
-                    break;
-                case (2):
-                    condition="C";
-                    break;
-            }
-            for (int j = 1; j < 3; j++) {
+
+
+            char letter = (char) ('A' + i);
+            condition = String.valueOf(letter);
+            for (int j = 1; j <= limit; j++) {
                 for (Iterator<Map.Entry<List<Integer>, Integer>> iterator = tmpNumbers.entrySet().iterator(); iterator.hasNext(); ) {
 
                     Map.Entry<List<Integer>, Integer> entry = iterator.next();
@@ -243,6 +237,13 @@ public class Parser {
     public static List<List<Integer>> findTestCasesForMcDc(Map<List<Integer>, List<String>> cases){
         List<Integer> keyWithLongestValue = null;
         int maxLength = 0;
+        List<Integer> numConditions=new ArrayList<>();
+        if (!cases.isEmpty()) {
+            numConditions = cases.keySet().iterator().next();
+        }
+
+
+
         List<List<Integer>> testCases= new ArrayList<>();
         Map<List<Integer>, List<String>> tmpCases= new HashMap<>(cases);
 
@@ -256,18 +257,55 @@ public class Parser {
             }
 
         }
+
+
+
+
         testCases.add(keyWithLongestValue);
-        for (String value: tmpCases.get(keyWithLongestValue)) {
-            for ( List<Integer> val: tmpCases.keySet()){
-                List<String> KeValues= tmpCases.get(val);
-                if(KeValues.contains(value)){
-                    testCases.add(val);
-                    KeValues.remove(value);
-                    tmpCases.put(val, KeValues);
-                    break;
+        for (String value : new ArrayList<>(tmpCases.get(keyWithLongestValue))) {
+            for (List<Integer> val : new ArrayList<>(tmpCases.keySet())) {
+                List<String> KeValues = tmpCases.get(val);
+                if (KeValues.contains(value)) {
+                    if(!(testCases.contains(val))){
+                        testCases.add(val);
+                        tmpCases.remove(val);
+                    }
                 }
             }
         }
+
+        char missingLetter='\0';
+        List<String> value = cases.get(keyWithLongestValue); // Wert des Schlüssels erhalten
+        int length = value.size();
+        char limit= (char) ('A'+ length);
+        if(length!=numConditions.size()){
+            List<Character> letters=new ArrayList<>();
+            for (String values: tmpCases.get(keyWithLongestValue)) {
+                letters.add(values.charAt(0));
+            }
+
+            for (char i = 'A'; i  <= limit; i++) {
+                if (!(letters.contains(i))) {
+                    missingLetter=i;
+                }
+
+            }
+
+
+            for (List<Integer> val : new ArrayList<>(tmpCases.keySet())){
+                List<String> KeValues = tmpCases.get(val);
+                if (KeValues.contains(Character.toString(missingLetter)+"1")) {
+                    if(!(testCases.contains(val))){
+                        testCases.add(val);
+                        tmpCases.remove(val);
+                    }
+                }
+
+            }
+
+
+        }
+
         System.out.println(testCases);
         return testCases;
 
@@ -292,22 +330,52 @@ public class Parser {
 
     }
 
+    public static void generateList(List<String> pathNames, boolean coverage) {
+        int counter= 0;
+            for (String path: pathNames) {
+                if(coverage){
+                String[] elements= readData(path);
+                String pathResult= path.substring(0, path.length() - 3);
+                writeData("/Users/yaseminakaydin/Desktop/exercises/" + pathResult + "McDcTest"  + counter+ ".md" ,
+                        header(elements),findConditionsForMcDC(
+                                findTestCasesForMcDc(
+                                        generateTestMCDC(3,numbers(elements))), numbers(elements)) );
 
-    public static void main(String[] args) throws IOException {
-        String datName = "/Users/yaseminakaydin/Desktop/exercises/example.md";
-        String[] elements= readData(datName);
-        System.out.println(numbers(elements));
-        System.out.println(header(elements));
-       //writeData("/Users/yaseminakaydin/Desktop/exercises/hallo", header(elements), numbers(elements));
-       //convertListToMap(numbers(elements));
-       List<List<Integer>> nums= mapToList(generateMBUU(numbers(elements)));
-       writeData("/Users/yaseminakaydin/Desktop/exercises/mbuuTest.md", header(elements), nums);
-       //findTestCasesForMcDc(generateTestMCDC(3, numbers(elements)));
-       //findConditionsForMcDC(findTestCasesForMcDc(generateTestMCDC(3,numbers(elements))), numbers(elements));
-       //writeData("/Users/yaseminakaydin/Desktop/exercises/hallo.md", header(elements),findConditionsForMcDC(findTestCasesForMcDc(generateTestMCDC(3,numbers(elements))), numbers(elements)) );
+                counter++;
+
+            } else {
+                    String[] elements= readData(path);
+                    String pathResult= path.substring(0, path.length() - 3);
+                    List<List<Integer>> nums= Parser.mapToList(Parser.generateMBUU(Parser.numbers(elements)));
+                    writeData("/Users/yaseminakaydin/Desktop/exercises/" + pathResult + "MBUUTest"+ counter+".md", Parser.header(elements), nums);
+                }
 
 
+
+        }
 
 
     }
+
+
+
+
+//    public static void main(String[] args) throws IOException {
+//        String datName = "/Users/yaseminakaydin/Desktop/exercises/exercise1.md";
+//        String[] elements= readData(datName);
+//        System.out.println(numbers(elements));
+//        System.out.println(header(elements));
+//       //writeData("/Users/yaseminakaydin/Desktop/exercises/hallo", header(elements), numbers(elements));
+//       //convertListToMap(numbers(elements));
+//       //List<List<Integer>> nums= mapToList(generateMBUU(numbers(elements)));
+//       //writeData("/Users/yaseminakaydin/Desktop/exercises/mbuuTest.md", header(elements), nums);
+//        generateTestMCDC(3, numbers(elements));
+//       findTestCasesForMcDc(generateTestMCDC(3, numbers(elements)));
+//       //findConditionsForMcDC(findTestCasesForMcDc(generateTestMCDC(3,numbers(elements))), numbers(elements));
+//       writeData("/Users/yaseminakaydin/Desktop/exercises/mcdcExercise1.md", header(elements),findConditionsForMcDC(findTestCasesForMcDc(generateTestMCDC(3,numbers(elements))), numbers(elements)) );
+//
+//
+//
+//
+//    }
 }
